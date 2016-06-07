@@ -7,10 +7,15 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.pili.pldroid.streaming.StreamingProfile;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,8 +27,26 @@ public class MainActivity extends Activity {
     private static final String TAG = "MainActivity";
     private static final String url = "your app server address.";
 
+    private static final String[] m = {"Water", "Normal"};
+
+    private TextView view;
+    private Spinner spinner;
+    private ArrayAdapter<String> adapter;
+    private String water;
+
     private static boolean isSupportHWEncode() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2;
+    }
+
+    class SpinnerSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
+                                   long arg3) {
+            water = m[arg2];
+        }
+
+        public void onNothingSelected(AdapterView<?> arg0) {
+        }
     }
 
     private String requestStreamJson() {
@@ -79,6 +102,7 @@ public class MainActivity extends Activity {
                         return;
                     }
                     intent.putExtra(Config.EXTRA_KEY_STREAM_JSON, resByHttp);
+                    intent.putExtra("Water", water);
                 }
 
                 startActivity(intent);
@@ -108,6 +132,24 @@ public class MainActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        view = (TextView) findViewById(R.id.waterText);
+        spinner = (Spinner) findViewById(R.id.SpinnerWater);
+        //将可选内容与ArrayAdapter连接起来
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, m);
+
+        //设置下拉列表的风格
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //将adapter 添加到spinner中
+        spinner.setAdapter(adapter);
+
+        //添加事件Spinner事件监听
+        spinner.setOnItemSelectedListener(new SpinnerSelectedListener());
+
+        //设置默认值
+        spinner.setVisibility(View.VISIBLE);
 
         if ( isExternalStorageWritable() ) {
 
@@ -139,7 +181,6 @@ public class MainActivity extends Activity {
             // not accessible
         }
 
-        setContentView(R.layout.activity_main);
         TextView mVersionInfoTextView = (TextView) findViewById(R.id.version_info);
         mVersionInfoTextView.setText("v1.6.2");
 

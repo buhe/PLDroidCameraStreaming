@@ -119,6 +119,7 @@ public class StreamingBaseActivity extends Activity implements
     private static final String[] m = {"480", "720", "1088"};
 
     private String currentVideoSize = "480" ;
+    protected String water = "Water";
 
     static class Entry {
         int videoSize;
@@ -264,7 +265,7 @@ public class StreamingBaseActivity extends Activity implements
 //
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_v7a");
-
+        water = getIntent().getStringExtra("Water");
         String streamJsonStrFromServer = "{\n" +
                 "  id: \"buhe\",\n" +
                 "  title: \"buhe\",\n" +
@@ -495,7 +496,7 @@ public class StreamingBaseActivity extends Activity implements
                         + "\nvideo:" + streamStatus.videoFps + " fps");
             }
         });
-        Log.i("TEST","video:" + streamStatus.videoFps + " fps time:" + System.currentTimeMillis() + " vs:" + currentVideoSize);
+        Log.i("TEST","video:" + streamStatus.videoFps + " fps " + extraMsg());
     }
 
     private class Switcher implements Runnable {
@@ -603,10 +604,10 @@ public class StreamingBaseActivity extends Activity implements
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_EMPTY:
-                Log.i("TEST","buffer empty:" + System.currentTimeMillis() + " vs:" + currentVideoSize);
+                Log.i("TEST","buffer empty:" + extraMsg());
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
-                Log.i("TEST","buffer full:" + System.currentTimeMillis() + " vs:" + currentVideoSize);
+                Log.i("TEST","buffer full:" + extraMsg());
                 break;
             case CameraStreamingManager.STATE.AUDIO_RECORDING_FAIL:
                 break;
@@ -826,5 +827,9 @@ public class StreamingBaseActivity extends Activity implements
             ex.printStackTrace();
         }
         return new DnsManager(NetworkInfo.normal, new IResolver[]{r0, r1, r2});
+    }
+
+    private String extraMsg(){
+        return "time:" + System.currentTimeMillis() + " vs:" + currentVideoSize + " water:" + water;
     }
 }

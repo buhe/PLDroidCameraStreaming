@@ -9,6 +9,7 @@ import com.pili.pldroid.streaming.CameraStreamingManager;
 import com.pili.pldroid.streaming.CameraStreamingManager.EncodingType;
 import com.pili.pldroid.streaming.WatermarkSetting;
 import com.pili.pldroid.streaming.widget.AspectFrameLayout;
+
 /**
  * Created by jerikc on 15/10/29.
  */
@@ -26,12 +27,17 @@ public class SWCodecCameraStreamingActivity extends StreamingBaseActivity {
                 (CameraPreviewFrameView) findViewById(R.id.cameraPreview_surfaceView);
         cameraPreviewFrameView.setListener(this);
 
-        WatermarkSetting watermarksetting = new WatermarkSetting(this, R.drawable.qiniu_logo, WatermarkSetting.WATERMARK_LOCATION.SOUTH_WEST, WatermarkSetting.WATERMARK_SIZE.MEDIUM, 100);
 
         mCameraStreamingManager = new CameraStreamingManager(this, afl, cameraPreviewFrameView,
                 EncodingType.SW_VIDEO_WITH_SW_AUDIO_CODEC); // sw codec
 
-        mCameraStreamingManager.prepare(mCameraStreamingSetting, mMicrophoneStreamingSetting, watermarksetting, mProfile);
+        if (water.equals("Water")) {
+            WatermarkSetting watermarksetting = new WatermarkSetting(this, R.drawable.qiniu_logo, WatermarkSetting.WATERMARK_LOCATION.SOUTH_WEST, WatermarkSetting.WATERMARK_SIZE.MEDIUM, 100);
+            mCameraStreamingManager.prepare(mCameraStreamingSetting, mMicrophoneStreamingSetting, watermarksetting, mProfile);
+        } else {
+            mCameraStreamingManager.prepare(mCameraStreamingSetting, mMicrophoneStreamingSetting, mProfile);
+        }
+
 
         mCameraStreamingManager.setStreamingStateListener(this);
         mCameraStreamingManager.setSurfaceTextureCallback(this);

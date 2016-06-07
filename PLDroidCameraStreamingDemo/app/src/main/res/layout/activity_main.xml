@@ -27,6 +27,22 @@
         android:layout_below="@id/sw_codec_camera_streaming_btn"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_below="@id/start_pure_audio_streaming_btn"
+        >
+        <TextView android:id="@+id/waterText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"></TextView>
+        <Spinner android:id="@+id/SpinnerWater"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"></Spinner>
+    </LinearLayout>
     <TextView
         android:id="@+id/version_info"
         android:contentDescription="@string/cd_tv_version_info"

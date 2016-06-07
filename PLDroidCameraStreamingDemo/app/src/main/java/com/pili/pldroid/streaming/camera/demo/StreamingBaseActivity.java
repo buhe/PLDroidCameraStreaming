@@ -16,7 +16,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -46,7 +49,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by jerikc on 15/7/6.
@@ -83,10 +88,10 @@ public class StreamingBaseActivity extends Activity implements
     private boolean mIsNeedMute = false;
     private boolean isEncOrientationPort = true;
 
-    protected static final int MSG_START_STREAMING  = 0;
-    protected static final int MSG_STOP_STREAMING   = 1;
-    private static final int MSG_SET_ZOOM           = 2;
-    private static final int MSG_MUTE               = 3;
+    protected static final int MSG_START_STREAMING = 0;
+    protected static final int MSG_STOP_STREAMING = 1;
+    private static final int MSG_SET_ZOOM = 2;
+    private static final int MSG_MUTE = 3;
 
     protected String mStatusMsgContent;
 
@@ -110,6 +115,38 @@ public class StreamingBaseActivity extends Activity implements
 
     private Screenshooter mScreenshooter = new Screenshooter();
     private EncodingOrientationSwitcher mEncodingOrientationSwitcher = new EncodingOrientationSwitcher();
+
+    private static final String[] m = {"480", "720", "1088"};
+
+    static class Entry {
+        int videoSize;
+        int bitRate;
+
+        public Entry(int videoSize, int bitRate) {
+            this.videoSize = videoSize;
+            this.bitRate = bitRate;
+        }
+
+        @Override
+        public String toString() {
+            return bitRate + "Kbs";
+        }
+    }
+
+    private static final Map<String, Entry> mapping = new HashMap<>();
+
+    static {
+//        mapping.put("240",0);
+        mapping.put("480", new Entry(1, 1000));
+//        mapping.put("544",2);
+        mapping.put("720", new Entry(3, 3000));
+        mapping.put("1088", new Entry(4, 5000));
+    }
+
+
+    private TextView view;
+    private Spinner spinner;
+    private ArrayAdapter<String> adapter;
 
     protected Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
@@ -157,6 +194,26 @@ public class StreamingBaseActivity extends Activity implements
         }
     };
 
+    class SpinnerSelectedListener implements AdapterView.OnItemSelectedListener {
+
+        public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
+                                   long arg3) {
+            view.setText(m[arg2] + "P" + mapping.get(m[arg2]).toString());
+
+            mProfile.setEncodingSizeLevel(mapping.get(m[arg2]).videoSize);
+
+            StreamingProfile.AudioProfile aProfile = new StreamingProfile.AudioProfile(44100, 96 * 1024);
+            StreamingProfile.VideoProfile vProfile = new StreamingProfile.VideoProfile(30, mapping.get(m[arg2]).bitRate * 1024, 48);
+            StreamingProfile.AVProfile avProfile = new StreamingProfile.AVProfile(vProfile, aProfile);
+            mProfile.setAVProfile(avProfile);
+            mCameraStreamingManager.setStreamingProfile(mProfile);
+
+        }
+
+        public void onNothingSelected(AdapterView<?> arg0) {
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
@@ -177,6 +234,23 @@ public class StreamingBaseActivity extends Activity implements
         setRequestedOrientation(Config.SCREEN_ORIENTATION);
 
         setContentView(R.layout.activity_camera_streaming);
+
+        view = (TextView) findViewById(R.id.spinnerText);
+        spinner = (Spinner) findViewById(R.id.Spinner01);
+        //将可选内容与ArrayAdapter连接起来
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, m);
+
+        //设置下拉列表的风格
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        //将adapter 添加到spinner中
+        spinner.setAdapter(adapter);
+
+        //添加事件Spinner事件监听
+        spinner.setOnItemSelectedListener(new SpinnerSelectedListener());
+
+        //设置默认值
+        spinner.setVisibility(View.VISIBLE);
 //
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_AAC,
@@ -188,7 +262,14 @@ public class StreamingBaseActivity extends Activity implements
 //        SharedLibraryNameHelper.getInstance().renameSharedLibrary(
 //                SharedLibraryNameHelper.PLSharedLibraryType.PL_SO_TYPE_H264, "pldroid_streaming_h264_encoder_v7a");
 
-        String streamJsonStrFromServer = getIntent().getStringExtra(Config.EXTRA_KEY_STREAM_JSON);
+        String streamJsonStrFromServer = "{\n" +
+                "  id: \"buhe\",\n" +
+                "  title: \"buhe\",\n" +
+                "  hub: \"pilitest\",\n" +
+                "  publishKey: \"6eeee8a82246636e\",\n" +
+                "  publishSecurity: \"static\",\n" +
+                "  hosts: {publish: {rtmp: \"pili-publish.pilitest.qiniucdn.com\"}}\n" +
+                "}";
         Log.i(TAG, "streamJsonStrFromServer:" + streamJsonStrFromServer);
 
         try {
@@ -535,10 +616,10 @@ public class StreamingBaseActivity extends Activity implements
             case CameraStreamingManager.STATE.CAMERA_SWITCHED:
 //                mShutterButtonPressed = false;
                 if (extra != null) {
-                    Log.i(TAG, "current camera id:" + (Integer)extra);
+                    Log.i(TAG, "current camera id:" + (Integer) extra);
                 }
                 Log.i(TAG, "camera switched");
-                final int currentCamId = (Integer)extra;
+                final int currentCamId = (Integer) extra;
                 this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -683,7 +764,7 @@ public class StreamingBaseActivity extends Activity implements
 
     protected void setFocusAreaIndicator() {
         if (mRotateLayout == null) {
-            mRotateLayout = (RotateLayout)findViewById(R.id.focus_indicator_rotate_layout);
+            mRotateLayout = (RotateLayout) findViewById(R.id.focus_indicator_rotate_layout);
             mCameraStreamingManager.setFocusAreaIndicator(mRotateLayout,
                     mRotateLayout.findViewById(R.id.focus_indicator));
         }
@@ -707,7 +788,7 @@ public class StreamingBaseActivity extends Activity implements
     }
 
     private void saveToSDCard(String filename, Bitmap bmp) throws IOException {
-        if(Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
+        if (Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED)) {
             File file = new File(Environment.getExternalStorageDirectory(), filename);
             BufferedOutputStream bos = null;
             try {

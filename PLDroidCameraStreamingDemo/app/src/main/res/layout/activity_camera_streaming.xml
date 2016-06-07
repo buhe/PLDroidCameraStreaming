@@ -65,6 +65,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+
+
     <Button
         android:id="@+id/capture_btn"
         android:contentDescription="@string/cd_btn_capture"
@@ -96,6 +98,24 @@
         android:textColor="@color/pldroid_streaming_white"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_centerVertical="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="150dp"
+        android:layout_marginLeft="@dimen/pldroid_streaming_item_padding"
+        >
+        <TextView android:id="@+id/spinnerText"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"></TextView>
+        <Spinner android:id="@+id/Spinner01"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"></Spinner>
+    </LinearLayout>
 
     <include layout="@layout/status" />
     <include layout="@layout/camera_button_holder" />

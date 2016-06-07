@@ -68,7 +68,8 @@ public class MainActivity extends Activity {
                 String resByHttp = null;
 
                 if (!Config.DEBUG_MODE) {
-                    resByHttp = requestStreamJson();
+//                    resByHttp = requestStreamJson();
+                    resByHttp = "";
                     Log.i(TAG, "resByHttp:" + resByHttp);
                     if (resByHttp == null) {
                         showToast("Stream Json Got Fail!");

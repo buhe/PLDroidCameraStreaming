@@ -492,6 +492,7 @@ public class StreamingBaseActivity extends Activity implements
                         + "\nvideo:" + streamStatus.videoFps + " fps");
             }
         });
+        Log.i("TEST","video:" + streamStatus.videoFps + " fps time:" + System.currentTimeMillis());
     }
 
     private class Switcher implements Runnable {
@@ -599,8 +600,10 @@ public class StreamingBaseActivity extends Activity implements
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_EMPTY:
+                Log.i("TEST","buffer empty:" + System.currentTimeMillis());
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
+                Log.i("TEST","buffer full:" + System.currentTimeMillis());
                 break;
             case CameraStreamingManager.STATE.AUDIO_RECORDING_FAIL:
                 break;

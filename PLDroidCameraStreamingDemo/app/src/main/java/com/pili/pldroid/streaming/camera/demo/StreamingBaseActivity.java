@@ -118,6 +118,8 @@ public class StreamingBaseActivity extends Activity implements
 
     private static final String[] m = {"480", "720", "1088"};
 
+    private String currentVideoSize = "480" ;
+
     static class Entry {
         int videoSize;
         int bitRate;
@@ -199,6 +201,7 @@ public class StreamingBaseActivity extends Activity implements
         public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2,
                                    long arg3) {
             view.setText(m[arg2] + "P" + mapping.get(m[arg2]).toString());
+            currentVideoSize = m[arg2];
 
             mProfile.setEncodingSizeLevel(mapping.get(m[arg2]).videoSize);
 
@@ -492,7 +495,7 @@ public class StreamingBaseActivity extends Activity implements
                         + "\nvideo:" + streamStatus.videoFps + " fps");
             }
         });
-        Log.i("TEST","video:" + streamStatus.videoFps + " fps time:" + System.currentTimeMillis());
+        Log.i("TEST","video:" + streamStatus.videoFps + " fps time:" + System.currentTimeMillis() + " vs:" + currentVideoSize);
     }
 
     private class Switcher implements Runnable {
@@ -600,10 +603,10 @@ public class StreamingBaseActivity extends Activity implements
                 mStatusMsgContent = getString(R.string.string_state_ready);
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_EMPTY:
-                Log.i("TEST","buffer empty:" + System.currentTimeMillis());
+                Log.i("TEST","buffer empty:" + System.currentTimeMillis() + " vs:" + currentVideoSize);
                 break;
             case CameraStreamingManager.STATE.SENDING_BUFFER_FULL:
-                Log.i("TEST","buffer full:" + System.currentTimeMillis());
+                Log.i("TEST","buffer full:" + System.currentTimeMillis() + " vs:" + currentVideoSize);
                 break;
             case CameraStreamingManager.STATE.AUDIO_RECORDING_FAIL:
                 break;
